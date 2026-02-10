@@ -6,4 +6,5 @@ pandas
 chromadb
 sentence-transformers
 requests
+gunicorn
 firebase-admin
