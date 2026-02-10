@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GENESIS AI</title>
+
+<style>
+
+
+
+#shaderCanvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
+
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color:white;
+    overflow-x:hidden;
+}
+
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:40px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+h1{
+    font-size:48px;
+    letter-spacing:3px;
+    background: linear-gradient(90deg,#1d4ccd,#af3eba);
+    -webkit-text-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.tag{
+    opacity:.7;
+    margin-bottom:40px;
+}
+
+input{
+    width:60%;
+    padding:18px;
+    border-radius:12px;
+    border:none;
+    font-size:18px;
+    background:#020617;
+    color:white;
+    outline:none;
+    box-shadow:0 0 20px rgba(0,255,255,.2);
+}
+
+input[type="file"]{
+    padding:10px;
+    font-size:16px;
+}
+
+.file-list{
+    margin-top:15px;
+    font-size:14px;
+    opacity:0.8;
+}
+
+button{
+    padding:16px 30px;
+    margin:10px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+    background:linear-gradient(90deg,#06b6d4,#8b5cf6);
+    color:white;
+    box-shadow:0 0 20px rgba(139,92,246,.5);
+    transition:.2s;
+    flex:1;
+}
+button:hover{transform:scale(1.05);}
+
+.buttons-container{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    width:100%;
+    margin-top:20px;
+}
+
+.card{
+    margin-top:40px;
+    padding:25px;
+    border-radius:20px;
+    background:rgba(255,255,255,.05);
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 40px rgba(0,255,255,.15);
+    text-align:justify;
+    white-space:pre-wrap;
+    width:100%;
+    color: white;
+}
+
+.thinking{
+    margin-top:30px;
+    font-size:18px;
+    opacity:.8;
+}
+
+.loader{
+    width:20px;
+    height:20px;
+    border:3px solid #fff;
+    border-top:3px solid cyan;
+    border-radius:50%;
+    display:inline-block;
+    animation:spin 1s linear infinite;
+}
+
+.agent-log {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: white;
+    background: #000;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    text-align: left;
+    border-left: 3px solid #5c74eb;/* VERY BUTIFUL BLUE*/
+}
+
+.agent-step {
+    margin-bottom: 5px;
+    display: block;
+}
+
+.agent-step.active::before {
+    content: "▹ ";
+    animation: blink 1s infinite;
+}
+
+
+
+@keyframes spin{
+    0%{transform:rotate(0)}
+    100%{transform:rotate(360deg)}
+}
+
+.prototype-container {
+    margin-top: 24px;
+}
+
+.prototype-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.code-panel {
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 8px;
+    max-height: 420px;
+    overflow: auto;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+}
+
+.code-panel h3 {
+    margin-top: 0;
+    color: #0932a45e;
+}
+
+.code-panel code {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.preview-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.preview-panel h3 {
+    color: #af3eba;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.phone-frame {
+    width: 260px;
+    height: 480px;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    font-family: system-ui;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.appbar {
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    padding: 8px;
+    color: #1d4ccd;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.hero h4 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 16px;
+}
+
+.hero p {
+    margin: 4px 0 0 0;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.card {
+    background: #09345f00;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    color: #b0bdd2;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.phone-frame .cta {
+    margin-top: auto;
+    background: linear-gradient(90deg,#06b6d4,#8b5cf6);
+    color: rgb(28, 66, 103);
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.preview-note {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+@media (max-width: 1024px) {
+    .prototype-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="shaderCanvas"></canvas>
+
+<div class="container">
+
+<h1>GENESIS</h1>
+<div class="tag">Autonomous Startup Intelligence</div>
+
+<input id="topic" placeholder="Enter any domain (health, farming, AI, education...)"/>
+<br>
+<input type="file" id="files" multiple accept="image/*,.pdf,.txt,.doc,.docx,video/*" />
+<div id="fileList" class="file-list"></div>
+<br>
+<button onclick="startGenesis()">Initiate Genesis</button>
+
+<div id="thinking" class="thinking"></div>
+<div id="output"></div>
+
+<script src="/static/shader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</div>
+
+<script>
+
+const backend="http://127.0.0.1:5000"; // change after deploy
+
+async function startGenesis(){
+    let topic=document.getElementById("topic").value;
+    let fileInput=document.getElementById("files");
+    
+    if(!topic){alert("enter topic");return;}
+
+    document.getElementById("output").innerHTML="";
+    const t=document.getElementById("thinking");
+
+    // thinking animation
+    let steps=[
+        "Scanning global problems...",
+        "Detecting unsolved pain points...",
+        "Designing scalable solution...",
+        "Validating originality...",
+        "Generating startup architecture..."
+    ];
+
+    let i=0;
+    t.innerHTML='<span class="loader"></span> '+steps[i];
+
+    let interval=setInterval(()=>{
+        i++;
+        if(i<steps.length){
+            t.innerHTML='<span class="loader"></span> '+steps[i];
+        }
+    },1500);
+
+    // CALL GENERATE with files
+    let formData=new FormData();
+    formData.append("topic",topic);
+    
+    if(fileInput.files.length>0){
+        for(let i=0;i<fileInput.files.length;i++){
+            formData.append("files",fileInput.files[i]);
+        }
+    }
+
+    let res=await fetch(backend+"/generate",{
+        method:"POST",
+        body:formData
+    });
+
+    let data=await res.json();
+    clearInterval(interval);
+
+    t.innerHTML="";
+
+    if(data.idea){
+        showIdea(data.idea,topic);
+    }else{
+        t.innerHTML="Error: "+(data.error||"Failed to generate idea");
+    }
+}
+
+document.getElementById("files").addEventListener("change",function(){
+    let fileList=document.getElementById("fileList");
+    if(this.files.length>0){
+        fileList.innerHTML="<strong>Attached:</strong> "+Array.from(this.files).map(f=>f.name).join(", ");
+    }else{
+        fileList.innerHTML="";
+    }
+});
+
+function showIdea(text,topic){
+
+    let html=`
+    <div class="card">
+    <h2 style="color: white;">Startup Generated</h2>
+    <div id="ideaOutput">${text}</div>
+    <div class="buttons-container">
+    <button onclick="validateIdea()">Validate Innovation</button>
+    <button onclick="deepAnalysis()">Deep VC Analysis</button>
+    <button onclick="unicornPredict()">Unicorn Predictor</button>
+    </div>
+    </div>   
+    `;
+
+    document.getElementById("output").innerHTML=html;
+    window.currentIdea=text;
+    window.currentTopic=topic;
+}
+
+async function validateIdea(){
+    let out=document.getElementById("output");
+    out.innerHTML+=`<div class="card">Validating... <span class="loader"></span></div>`;
+
+    let res=await fetch(backend+"/validate",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({idea:window.currentIdea})
+    });
+
+    let data=await res.json();
+
+    out.innerHTML+=`
+    <div class="card">
+    <h3>Validation Result</h3>
+    ${data.validation}
+    </div>
+    `;
+}
+
+
+
+async function deepAnalysis() {
+    let out = document.getElementById("output");
+    
+    // Create the log container
+    const logId = "log-" + Date.now();
+    out.innerHTML += `
+        <div class="card" id="${logId}">
+            <h3 style="color:#af3eba">🏛️ Boardroom Simulation</h3>
+            <div class="agent-log" id="status-ticker">
+                <span class="agent-step active">Initializing the Boardroom...</span>
+            </div>
+            <div class="loader"></div>
+        </div>
+    `;
+
+    const ticker = document.getElementById("status-ticker");
+    const steps = [
+        "Summoning the Brutal Realist VC...",
+        "Realist is analyzing market saturation data...",
+        "REALIST: Identifying structural weaknesses...",
+        "Alerting the Visionary Founder for rebuttal...",
+        "VISIONARY: Drafting counter-strategies...",
+        "VISIONARY: Calculating pivot potential...",
+        "Senior Analyst is weighing the evidence...",
+        "Finalizing Investment Verdict...",
+        "Heavy Debate Ensues in the Boardroom, Please Wait..."
+    ];
+
+    let stepIdx = 0;
+    const interval = setInterval(() => {
+        if (stepIdx < steps.length) {
+            ticker.innerHTML += `<span class="agent-step active">${steps[stepIdx]}</span>`;
+            stepIdx++;
+            // Auto-scroll the ticker
+            ticker.scrollTop = ticker.scrollHeight;
+        }
+    }, 2500); // Cycles every 2.5 seconds to match backend latency
+
+    try {
+        let res = await fetch(backend + "/deepvalidate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idea: window.currentIdea })
+        });
+
+        let data = await res.json();
+        clearInterval(interval);
+        console.log("Response received:", data);
+
+        // Replace the loader and ticker with the final result
+        const logCard = document.getElementById(logId);
+        
+        if (data.error) {
+            logCard.innerHTML = `
+                <h3 style="color:#ef4444">🚨 Boardroom Error</h3>
+                <div style="text-align:left; line-height:1.6; color:#ef4444;">
+                    <p><strong>Error:</strong> ${data.error}</p>
+                    ${data.details ? `<p><strong>Details:</strong> ${data.details}</p>` : ''}
+                </div>
+            `;
+        } else if (data.analysis) {
+            try {
+                logCard.innerHTML = `
+                    <h3 style="color:#af3eba">🏛️ Boardroom Verdict</h3>
+                    <div style="text-align:left; line-height:1.6;">
+                        ${typeof marked !== 'undefined' ? marked.parse(data.analysis) : `<pre>${data.analysis}</pre>`} 
+                    </div>
+                    <button onclick="showFinancialModeling()" style="margin-top: 20px; margin-right: 10px;">📊 Generate Financial Model</button>
+                    <button onclick="generatePrototype()" style="margin-top: 20px;">🎨 Simulate Product Prototype</button>
+                `;
+            } catch (mdErr) {
+                logCard.innerHTML = `
+                    <h3 style="color:#af3eba">🏛️ Boardroom Verdict</h3>
+                    <div style="text-align:left; line-height:1.6;">
+                        <pre>${data.analysis}</pre>
+                    </div>
+                    <button onclick="showFinancialModeling()" style="margin-top: 20px; margin-right: 10px;">📊 Generate Financial Model</button>
+                    <button onclick="generatePrototype()" style="margin-top: 20px;">🎨 Simulate Product Prototype</button>
+                `;
+            }
+        } else {
+            logCard.innerHTML = `
+                <h3 style="color:#ef4444">🚨 Unexpected Response</h3>
+                <div style="text-align:left; line-height:1.6; color:#ef4444;">
+                    <p>The server returned an unexpected response.</p>
+                    <p>Debug: ${JSON.stringify(data)}</p>
+                </div>
+            `;
+        }
+    } catch (err) {
+        clearInterval(interval);
+        const logCard = document.getElementById(logId);
+        logCard.innerHTML = `
+            <h3 style="color:#ef4444">🚨 Connection Error</h3>
+            <div style="text-align:left; line-height:1.6; color:#ef4444;">
+                <p><strong>Error:</strong> ${err.message || 'Boardroom connection lost. Please check your network and try again.'}</p>
+            </div>
+        `;
+    }
+}
+async function unicornPredict(){
+    let out=document.getElementById("output");
+    out.innerHTML+=`<div class="card">Predicting unicorn potential... <span class="loader"></span></div>`;
+
+    let res=await fetch(backend+"/unicorn_predict",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({idea:window.currentIdea})
+    });
+
+    let data=await res.json();
+
+    try {
+        out.innerHTML+=`
+        <div class="card">
+        <h3>Unicorn Prediction</h3>
+        ${typeof marked !== 'undefined' ? marked.parse(data.prediction) : `<pre>${data.prediction}</pre>`}
+        </div>
+        `;
+    } catch (err) {
+        out.innerHTML+=`
+        <div class="card">
+        <h3>Unicorn Prediction</h3>
+        <pre>${data.prediction}</pre>
+        </div>
+        `;
+    }
+}
+
+function showFinancialModeling() {
+    let out = document.getElementById("output");
+    out.innerHTML += `
+    <div class="card">
+    <hr />
+    <h3>📊 Generate 3-Year Revenue Model</h3>
+    <div style="margin-top: 10px;">
+      <label>Google Sheet ID</label><br />
+      <input
+        type="text"
+        id="sheetId"
+        placeholder="Paste Google Sheet ID here"
+        style="width: 100%; padding: 8px; color: white; background: #020617;"
+      />
+    </div>
+    <button
+      onclick="generateFinancials()"
+      style="margin-top: 12px; padding: 10px 16px;"
+    >
+      Generate Financial Model
+    </button>
+    <div id="financialStatus" style="margin-top: 12px;"></div>
+    </div>
+    `;
+}
+
+async function generateFinancials() {
+  const idea = document.getElementById("ideaOutput")?.innerText;
+  const sheetId = document.getElementById("sheetId").value;
+
+  if (!idea || !sheetId) {
+    alert("Missing idea or Sheet ID");
+    return;
+  }
+
+  document.getElementById("financialStatus").innerText = "⏳ Generating revenue model...";
+
+  try {
+    const response = await fetch(backend + "/financials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idea: idea,
+        spreadsheet_id: sheetId
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed");
+    }
+
+    document.getElementById("financialStatus").innerHTML = `
+      ✅ Revenue model created<br />
+      <a href="https://docs.google.com/spreadsheets/d/${sheetId}" target="_blank" style="color: #06b6d4; text-decoration: underline;">
+        Open Google Sheet
+      </a>
+    `;
+  } catch (err) {
+    document.getElementById("financialStatus").innerText = "❌ Error generating financials: " + err.message;
+  }
+}
+
+async function generatePrototype() {
+  const idea = document.getElementById("ideaOutput")?.innerText;
+
+  if (!idea) {
+    alert("No idea found");
+    return;
+  }
+
+  const out = document.getElementById("output");
+  const prototypeContainerId = "prototype-" + Date.now();
+  
+  out.innerHTML += `
+    <div class="card" id="${prototypeContainerId}">
+      <div class="prototype-container">
+        <h3>🎨 Prototype Simulation</h3>
+        <p>Generating Flutter UI prototype...</p>
+        <div class="loader"></div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const response = await fetch(backend + "/generate-prototype", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idea: idea
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to generate prototype");
+    }
+
+    const prototypeCard = document.getElementById(prototypeContainerId);
+    const flutterCode = data.flutter_code;
+
+    prototypeCard.innerHTML = `
+      <div class="prototype-container">
+        <h3>🎨 Prototype Simulation</h3>
+        <p>Generated Flutter UI prototype based on the validated idea.</p>
+        
+        <div class="prototype-grid">
+          <!-- LEFT: Flutter Code -->
+          <div class="code-panel">
+            <h3 style="margin-top: 0;">Generated Flutter Code</h3>
+            <code>${escapeHtml(flutterCode)}</code>
+          </div>
+
+          <!-- RIGHT: Visual Preview -->
+          <div class="preview-panel">
+            <h3 style="margin-top: 0;">UI Preview</h3>
+            <div class="phone-frame">
+              <div class="appbar">Genesis App</div>
+              <div class="hero">
+                <h4>Build with Gemini, Faster</h4>
+                <p>From idea to execution</p>
+              </div>
+              <div class="card">Feature One</div>
+              <div class="card">Feature Two</div>
+              <button class="cta">Get Started</button>
+            </div>
+            <span class="preview-note">
+              Visual simulation rendered from generated Flutter layout
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    const prototypeCard = document.getElementById(prototypeContainerId);
+    prototypeCard.innerHTML = `
+      <div class="prototype-container">
+        <h3>🎨 Prototype Simulation</h3>
+        <p style="color: #ef4444;">❌ Error generating prototype: ${err.message}</p>
+      </div>
+    `;
+  }
+}
+
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+
+
+</script>
+</body>
+</html>
