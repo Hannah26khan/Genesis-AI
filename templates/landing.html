@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero UI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+
+#shaderCanvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.navbar{
+    position:absolute;
+    top:28px;
+    left:45px;
+}
+
+/* MAIN LOGO */
+.logo-text{
+    font-size:42px;
+    font-weight:800;
+    font-family: 'Inter', sans-serif;
+    color:white;
+    letter-spacing:1px;
+    position:relative;
+}
+
+/* RED + CYAN SHADOW GLITCH */
+.logo-text{
+    text-shadow:
+        2px 2px 0 #00eaff,
+        -2px -2px 0 #ff003c,
+        0 0 18px rgba(0,255,255,0.7);
+}
+
+/* AI part styling */
+.logo-text span{
+    font-size:28px;
+    margin-left:8px;
+    color:#00eaff;
+    text-shadow:
+        2px 2px 0 #ff003c,
+        0 0 12px rgba(0,255,255,0.9);
+}
+
+
+
+
+body{
+    background:#071a3a; /* dark blue bg */
+    color:white;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* MAIN CONTAINER */
+.hero{
+    width:90%;
+    max-width:1300px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:40px;
+}
+
+/* LEFT SIDE */
+.left{
+    flex:1;
+}
+
+.small-caption{
+    display:inline-block;
+    padding:6px 14px;
+    border:1px solid #38bdf8; /* sky blue border */
+    color:#38bdf8;
+    border-radius:20px;
+    font-size:14px;
+    margin-bottom:20px;
+
+    /* white glow */
+    box-shadow:0 0 12px rgba(255,255,255,0.6);
+}
+
+h1{
+    font-size:64px;
+    font-weight:800;
+    line-height:1.1;
+    margin-bottom:20px;
+}
+
+.desc{
+    color:#cbd5e1;
+    font-size:18px;
+    line-height:1.6;
+    max-width:520px;
+    margin-bottom:30px;
+}
+
+/* BUTTONS */
+.buttons{
+    display:flex;
+    gap:20px;
+}
+
+.btn-primary{
+    background:#2563eb;
+    padding:14px 28px;
+    border-radius:10px;
+    border:none;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn-primary:hover{
+    background:#1d4ed8;
+    transform:translateY(-2px);
+}
+
+.btn-secondary{
+    color:#38bdf8;
+    font-weight:500;
+    cursor:pointer;
+}
+
+/* RIGHT SIDE IMAGE STACK */
+.right{
+    flex:1;
+    display:grid;
+    grid-template-columns: repeat(2, 180px);
+    gap:20px;
+    justify-content:center;
+}
+
+.card{
+    width:180px;
+    height:240px;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,0,0,0.6);
+    transition:0.3s;
+}
+
+.card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.card:hover{
+    transform:translateY(-8px) scale(1.03);
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+    .hero{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .right{
+        margin-top:40px;
+    }
+
+    h1{
+        font-size:42px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+
+    <div class="navbar">
+    <div class="logo-text">Genesis <span>AI</span></div>
+</div>
+
+
+    <!-- LEFT CONTENT -->
+    <div class="left">
+
+        <div class="small-caption">⚡ GENESIS AI</div>
+
+        <h1>
+            We’re building ideas<br>
+            that build the future
+        </h1>
+
+        <p class="desc">
+            Generate startup ideas, validate concepts, and launch faster than ever.
+            Your imagination meets artificial intelligence.
+        </p>
+
+        <div class="buttons">
+            <button class="btn-primary" onclick="window.location.href='/app'">Initiate Genesis</button>
+            <div class="btn-secondary">Live demo →</div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT IMAGES -->
+    <div class="right">
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b">
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c">
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692">
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+flask
+flask-cors
+python-dotenv
+google-generativeai
+pandas
+chromadb
+sentence-transformers
+requests
+firebase-admin
