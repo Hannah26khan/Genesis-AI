@@ -11,43 +11,41 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-# ------------------ SETUP ------------------
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# File upload configuration
+
 UPLOAD_FOLDER = "temp_uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "pdf", "txt", "doc", "docx", "mp4", "webm", "avi", "mov", "mkv", "flv"}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB max
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  
 
-# Firebase Firestore initialization
+
 firebase_cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
 if firebase_cred_path and os.path.exists(firebase_cred_path):
     try:
         cred = credentials.Certificate(firebase_cred_path)
         firebase_admin.initialize_app(cred)
         db = firestore.client()
-        print(" Firebase Firestore initialized successfully")
+        print("  Firebase Firestore initialized successfully")
     except Exception as e:
         print(f"  Firebase initialization failed: {e}")
         print("Continuing without Firestore...")
         db = None
 else:
-    print("⚠️  FIREBASE_CREDENTIALS_PATH not found in .env - Firestore disabled")
+    print("  FIREBASE_CREDENTIALS_PATH not found in .env - Firestore disabled")
     db = None
 
 
 
-# STARTING PAGE
+
 @app.route("/")
 def landing():
     return render_template("landing.html")
 
-# GENESIS APP PAGE
 @app.route("/app")
 def app_page():
     return render_template("index.html")
@@ -59,7 +57,6 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-# Initialize Gemini model (Google Search API calls handled by rag.py module)
 model = genai.GenerativeModel(model_name="gemini-3-pro-preview")
 
 
@@ -98,7 +95,7 @@ def generate_with_retry(prompt, max_retries=3, wait_time=10):
             else:
                 raise
 
-# ------------------ IDEA GENERATOR ------------------
+
 @app.route("/generate", methods=["POST"])
 def generate():
     topic = request.form.get("topic")
@@ -166,7 +163,7 @@ Why it's innovative:
         return jsonify({"error": f"Failed to generate idea: {str(e)}"}), 500
 
 
-# ------------------ VALIDATION ENGINE ------------------
+
 @app.route("/validate", methods=["POST"])
 def validate():
     data = request.get_json()
@@ -224,9 +221,9 @@ Recommendations:
                     'market_context': context_text,
                     'timestamp': firestore.SERVER_TIMESTAMP
                 })
-                print(f"✅ Validation saved to Firestore: {doc_ref.id}")
+                print(f" Validation saved to Firestore: {doc_ref.id}")
             except Exception as e:
-                print(f"⚠️  Failed to save validation to Firestore: {e}")
+                print(f"  Failed to save validation to Firestore: {e}")
 
         return jsonify({
             "status": "success",
@@ -237,7 +234,7 @@ Recommendations:
         return jsonify({"error": str(e)}), 500
 
 
-# ------------------ AUTO REGENERATE IF REJECTED ------------------
+
 @app.route("/regenerate", methods=["POST"])
 def regenerate():
     data = request.get_json()
@@ -276,7 +273,7 @@ Why it's 10x better:
         return jsonify({"error": str(e)}), 500
     
 
-#-----------------------------------------------Deep Validation Boardroom-----------------------------------------------
+-
 @app.route("/deepvalidate", methods=["POST"])
 def deepvalidate():
     data = request.get_json()
@@ -337,22 +334,23 @@ def deepvalidate():
         """
         analyst_response = generate_with_retry(analyst_prompt).text
 
-        # Aggregate the "Boardroom Minutes"
         full_analysis = f"""
-        ## 🚪 Boardroom Debate: The Verdict
+         
         
-        ### 🛑 The Realist's Critique
+        ###  The Realist's Critique
         {realist_response}
         
         ---
-        ### ⚡ The Visionary's Defense
+        ###  The Visionary's Defense
         {visionary_response}
         
         ---
-        ### 📊 Final Analyst Summary
+        ###  Final Analyst Summary
         {analyst_response}
         """
-        print(realist_response,visionary_response,analyst_response)
+        print(f"  Realist Response: {realist_response}")
+        print(f"  Visionary Response: {visionary_response}")
+        print(f"  Analyst Response: {analyst_response}")
 
         print("[DeepValidate] Analysis complete, returning to client")
         
@@ -369,9 +367,9 @@ def deepvalidate():
                     'market_context': market_context,
                     'timestamp': firestore.SERVER_TIMESTAMP
                 })
-                print(f"✅ Deep analysis saved to Firestore: {doc_ref.id}")
+                print(f"  Deep analysis saved to Firestore: {doc_ref.id}")
             except Exception as e:
-                print(f"⚠️  Failed to save deep analysis to Firestore: {e}")
+                print(f"  Failed to save deep analysis to Firestore: {e}")
         
         return jsonify({
             "status": "success",
@@ -419,7 +417,7 @@ Return structured response with real data backing each point.
     response = generate_with_retry(prompt)
     prediction_text = response.text
 
-    # Save to Firestore
+
     if db:
         try:
             doc_ref = db.collection('predictions').document()
@@ -429,9 +427,9 @@ Return structured response with real data backing each point.
                 'market_context': context_text,
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-            print(f"✅ Prediction saved to Firestore: {doc_ref.id}")
+            print(f"  Prediction saved to Firestore: {doc_ref.id}")
         except Exception as e:
-            print(f"⚠️  Failed to save prediction to Firestore: {e}")
+            print(f"  Failed to save prediction to Firestore: {e}")
 
     return jsonify({
         "status": "success",
@@ -440,7 +438,7 @@ Return structured response with real data backing each point.
 
 
 
-# ------------------ RAG ENDPOINTS (Google Search Powered) ------------------
+
 @app.route("/ingest", methods=["POST"])
 def ingest_endpoint():
     """
@@ -491,7 +489,7 @@ Provide a helpful answer based on the real market data above."""
         return jsonify({"error": str(e)}), 500
 
 
-#------------------ FINANCIAL MODELING TO SHEETS ------------------
+
 
 @app.route("/financials", methods=["POST"])
 def generate_financials():
@@ -574,9 +572,9 @@ Do not include markdown, backticks, or explanations.
                     "flutter_code": flutter_code,
                     "timestamp": firestore.SERVER_TIMESTAMP
                 })
-                print(f"✅ Prototype saved to Firestore: {doc_ref.id}")
+                print(f"  Prototype saved to Firestore: {doc_ref.id}")
             except Exception as e:
-                print(f"⚠️  Failed to save prototype to Firestore: {e}")
+                print(f"  Failed to save prototype to Firestore: {e}")
 
         return jsonify({
             "status": "success",
